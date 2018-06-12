@@ -15,7 +15,7 @@ there are several tricks, which are all based on modular arithmetic.
 For example,
 for 11 the procedure is:
 
-![Modulo 11 calculation](modulo_11_calculation.png "Modulo 11"),
+<img src="modulo_11_calculation.png" alt="modulo 11" width="300px"/>
 
 where `d_i` are the digits of the number base 10. Thus, finding the remainder
 modulo 11 is equivalent to taking the sum of digits with alternating signs.
