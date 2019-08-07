@@ -1,5 +1,7 @@
 # Remainder RNN
 
+## Update: as of June 2018 I am no longer adding or making changes to this code. I'm leaving it online in case anyone is interested.
+
 A small practice project with RNNs: classifying arbitrarily long integers by their remainder
 modulo a given divisor.
 
