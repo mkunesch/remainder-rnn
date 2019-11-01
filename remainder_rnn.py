@@ -9,11 +9,10 @@ classifies arbitrarily long integers by their remainder given a divisor.
 import sys
 
 import keras
-from keras.models import Sequential
-from keras.layers import Dense, LSTM, Dropout, TimeDistributed
 from keras.callbacks import ModelCheckpoint
+from keras.layers import Dense, Dropout, LSTM, TimeDistributed
+from keras.models import Sequential
 from keras.preprocessing import sequence
-
 import numpy as np
 
 from remainder_dataset import create_remainder_dataset

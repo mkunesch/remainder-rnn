@@ -8,11 +8,10 @@ user input.
 
 from keras.models import model_from_json
 from keras.utils import to_categorical
-
 import numpy as np
 
-from remainder_rnn import compile_model
 from remainder_dataset import create_remainder_dataset, random_digit_array
+from remainder_rnn import compile_model
 
 
 def load_model(filename="model.json"):
