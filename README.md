@@ -5,9 +5,9 @@
 A small practice project with RNNs: classifying arbitrarily long integers by their remainder
 modulo a given divisor.
 
-Disclaimer: I am not an expert on machine learning and only performed this experiment
-to get an intuition for some of the content in Andrew Ng's Deep Learning course
-on Coursera.
+Disclaimer: when I wrote this code, I was not an expert in machine learning and
+only used this experiment to get an intuition for some of the content in Andrew
+Ng's Deep Learning course on Coursera.
 
 Feedback, suggestions, and criticism are very welcome.
 
