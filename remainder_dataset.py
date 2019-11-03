@@ -27,16 +27,17 @@ def random_digit_array(max_length, distribute_length=False):
     else:
         length = max_length
 
-    number = random.randint(1, 10**length)
-    digit_array = [(number // 10**i) % 10
-                   for i in range(math.floor(math.log10(number)), -1, -1)]
+    number = random.randint(1, 10 ** length)
+    digit_array = [
+        (number // 10 ** i) % 10
+        for i in range(math.floor(math.log10(number)), -1, -1)
+    ]
     return number, digit_array
 
 
-def create_remainder_dataset(divisor,
-                             num_examples,
-                             max_length,
-                             distribute_length=False):
+def create_remainder_dataset(
+    divisor, num_examples, max_length, distribute_length=False
+):
     """Create a dataset of integers labelled by their remainder for a given divisor.
 
     Args:
@@ -54,8 +55,9 @@ def create_remainder_dataset(divisor,
 
     for i in range(num_examples):
         number, digit_array = random_digit_array(max_length, distribute_length)
-        digit_array = sequence.pad_sequences(
-            [digit_array], maxlen=max_length)[0, :]
+        digit_array = sequence.pad_sequences([digit_array], maxlen=max_length)[
+            0, :
+        ]
 
         remainder = number % divisor
         labels[i, remainder] = 1

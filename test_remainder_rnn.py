@@ -21,11 +21,13 @@ def interactive_test(model, divisor):
     is randomly generated.
     """
     test_sequence = input(
-        "Enter the sequence (leave blank for randomly generated number): ")
+        "Enter the sequence (leave blank for randomly generated number): "
+    )
     if test_sequence == "":
         print("No sequence entered. Using the random sequence:")
         number, digit_array = random_digit_array(
-            max_length=1000, distribute_length=True)
+            max_length=1000, distribute_length=True
+        )
         print(number)
     else:
         digit_array = [int(c) for c in list(test_sequence)]
@@ -33,8 +35,10 @@ def interactive_test(model, divisor):
 
     one_hot = to_categorical(digit_array, num_classes=10)
     one_hot = one_hot.reshape(1, one_hot.shape[0], one_hot.shape[1])
-    print("Predicted remainder: %d. Correct remainder: %d." %
-          (model.predict_classes(one_hot)[0], number % divisor))
+    print(
+        "Predicted remainder: %d. Correct remainder: %d."
+        % (model.predict_classes(one_hot)[0], number % divisor)
+    )
 
 
 def test(model, divisor, max_test_length=1000):
@@ -47,7 +51,8 @@ def test(model, divisor, max_test_length=1000):
     """
     print(f"Testing on numbers of up to {max_test_length} digits")
     test_data, test_labels = create_remainder_dataset(
-        divisor, num_examples=1000, max_length=max_test_length)
+        divisor, num_examples=1000, max_length=max_test_length
+    )
     test_loss, test_accuracy = model.evaluate(test_data, test_labels)
     print(f"Test accuracy: {test_accuracy}. Test loss: {test_loss}.")
 

@@ -32,7 +32,7 @@ def create_model(divisor, verbose=True):
     model.add(TimeDistributed(Dense(32)))
     model.add(Dropout(0.1))
     model.add(LSTM(5 * divisor))
-    model.add(Dense(divisor, activation='softmax'))
+    model.add(Dense(divisor, activation="softmax"))
     if verbose:
         model.summary()
 
@@ -43,9 +43,10 @@ def compile_model(model, learning_rate=0.01, decay=0.002):
     """Compile the given model using Adam optimiser."""
     optimizer = Adam(lr=learning_rate, decay=decay)
     model.compile(
-        loss='categorical_crossentropy',
+        loss="categorical_crossentropy",
         optimizer=optimizer,
-        metrics=['accuracy'])
+        metrics=["accuracy"],
+    )
 
 
 def train_model(model, divisor, callbacks=None):
@@ -57,10 +58,12 @@ def train_model(model, divisor, callbacks=None):
     """
     # Create validation data set
     val_data, val_labels = create_remainder_dataset(
-        divisor, num_examples=1000, max_length=100)
+        divisor, num_examples=1000, max_length=100
+    )
 
     data, labels = create_remainder_dataset(
-        divisor, num_examples=10000, max_length=10, distribute_length=True)
+        divisor, num_examples=10000, max_length=10, distribute_length=True
+    )
 
     epochs_per_phase = 15
     # Training phase 0 (just the short integers)
@@ -70,7 +73,8 @@ def train_model(model, divisor, callbacks=None):
         validation_data=(val_data, val_labels),
         epochs=epochs_per_phase,
         batch_size=64,
-        callbacks=callbacks)
+        callbacks=callbacks,
+    )
 
     # Training phase >= 1 (include longer integers)
     for phase in range(1, 3):
@@ -80,7 +84,8 @@ def train_model(model, divisor, callbacks=None):
 
         # Add longer integers to the training data
         data_long, labels_long = create_remainder_dataset(
-            divisor, 20000, max_length, distribute_length=False)
+            divisor, 20000, max_length, distribute_length=False
+        )
         data = sequence.pad_sequences(data, max_length)
         data = np.concatenate([data, data_long], axis=0)
         labels = np.concatenate([labels, labels_long], axis=0)
@@ -92,7 +97,8 @@ def train_model(model, divisor, callbacks=None):
             epochs=stop_epoch,
             batch_size=64,
             callbacks=callbacks,
-            initial_epoch=start_epoch)
+            initial_epoch=start_epoch,
+        )
 
 
 class LearningRateMonitor(keras.callbacks.Callback):
@@ -101,13 +107,19 @@ class LearningRateMonitor(keras.callbacks.Callback):
         decay = self.model.optimizer.decay
         iterations = self.model.optimizer.iterations
         iterations = keras.backend.cast(iterations, keras.backend.dtype(decay))
-        learning_rate = learning_rate / ( 1 + decay * iterations)
+        learning_rate = learning_rate / (1 + decay * iterations)
         print(f"Learning rate: {learning_rate}.")
 
 
 @click.command()
 @click.argument("model-path", type=click.Path(dir_okay=False))
-@click.option("-d", "--divisor", type=int, required=True, help="Divisor to train the model for.")
+@click.option(
+    "-d",
+    "--divisor",
+    type=int,
+    required=True,
+    help="Divisor to train the model for.",
+)
 def main(model_path, divisor):
     """Train an RNN to classify integers by their remainder.
 
@@ -122,10 +134,11 @@ def main(model_path, divisor):
     # Set up the checkpointing functionality
     checkpoint = ModelCheckpoint(
         model_path,
-        monitor='val_loss',
+        monitor="val_loss",
         verbose=1,
         save_best_only=True,
-        mode='auto')
+        mode="auto",
+    )
 
     # If a compatible checkpoint file was provided use it to restart
     try:
