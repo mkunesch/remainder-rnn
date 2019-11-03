@@ -1,7 +1,9 @@
+## Archived as of June 2018
+*As of June 2018 I am no longer adding or making changes to this code
+(apart perhpas from some minor updates, corrections, or modernisations).
+I'm leaving it online in case anyone is interested.*
+
 # Remainder RNN
-
-## Update: as of June 2018 I am no longer adding or making changes to this code. I'm leaving it online in case anyone is interested.
-
 A small practice project with RNNs: classifying arbitrarily long integers by their remainder
 modulo a given divisor.
 
@@ -54,5 +56,16 @@ Teacher-Student Curriculum Learning (Matiisen et al.,
 https://arxiv.org/abs/1707.00183). This is work in progress.
 
 ## Usage
-The scripts require Keras to run. Run e.g. `./remainder_rnn.py 13` to train for the
-divisor 13, then `./test_remainder_rnn.py` to test.
+Install the requirements in `requirements.txt`. Then run e.g.
+
+```
+python remainder_rnn.py -d 13 trained_model.hdf5
+```
+
+to train for the divisor 13, then
+
+```
+python test_remainder_rnn.py trained_model.hdf5
+```
+
+to test.
