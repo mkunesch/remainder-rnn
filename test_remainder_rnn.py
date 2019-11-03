@@ -5,22 +5,12 @@ This module contains the functionality to load a model and the weights from
 checkpoint files and to test the model on both a random test set and interactive
 user input.
 """
-
-from keras.models import model_from_json
-from keras.utils import to_categorical
+import click
 import numpy as np
+from tensorflow.keras.models import load_model
+from tensorflow.keras.utils import to_categorical
 
 from remainder_dataset import create_remainder_dataset, random_digit_array
-from remainder_rnn import compile_model
-
-
-def load_model(filename="model.json"):
-    """Load a model from a json file. """
-    json_file = open(filename, 'r')
-    model_json = json_file.read()
-    json_file.close()
-    model = model_from_json(model_json)
-    return model
 
 
 def interactive_test(model, divisor):
@@ -55,11 +45,11 @@ def test(model, divisor, max_test_length=1000):
         divisor: the divisor with which the remainder is to be calculated
         max_test_length: the maximum number of digits of test integers (base 10)
     """
-    print("Testing on numbers of up to %d digits" % max_test_length)
+    print(f"Testing on numbers of up to {max_test_length} digits")
     test_data, test_labels = create_remainder_dataset(
         divisor, num_examples=1000, max_length=max_test_length)
     test_loss, test_accuracy = model.evaluate(test_data, test_labels)
-    print("Test accuracy: %f. Test loss: %f." % (test_accuracy, test_loss))
+    print(f"Test accuracy: {test_accuracy}. Test loss: {test_loss}.")
 
     # Output incorrectly labelled test data
     output_labels = model.predict_classes(test_data)
@@ -70,15 +60,14 @@ def test(model, divisor, max_test_length=1000):
 
     print("Examples of incorrect predictions:")
     for err, wrong, right in zip(errors[0:5, :], error_labels, correct_labels):
-        print(err,
-              " was labeled as %d but should have been %d." % (wrong, right))
+        print(f"{err} was labeled as {wrong} but should have been {right}.")
 
 
-def main():
+@click.command()
+@click.argument("model-path", type=click.Path(dir_okay=False))
+def main(model_path):
     """Load model and weights from file and test."""
-    model = load_model()
-    model.load_weights("checkpoint_best.hdf5")
-    compile_model(model)
+    model = load_model(model_path)
 
     # The dimension of the last layer gives the divisor
     divisor = model.layers[-1].output_shape[-1]

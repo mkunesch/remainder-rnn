@@ -6,14 +6,14 @@ This module contains the functionality to create and train an RNN that
 classifies arbitrarily long integers by their remainder given a divisor.
 """
 
-import sys
-
-import keras
-from keras.callbacks import ModelCheckpoint
-from keras.layers import Dense, Dropout, LSTM, TimeDistributed
-from keras.models import Sequential
-from keras.preprocessing import sequence
+import click
 import numpy as np
+from tensorflow import keras
+from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.layers import LSTM, Dense, Dropout, TimeDistributed
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.preprocessing import sequence
 
 from remainder_dataset import create_remainder_dataset
 
@@ -34,14 +34,14 @@ def create_model(divisor, verbose=True):
     model.add(LSTM(5 * divisor))
     model.add(Dense(divisor, activation='softmax'))
     if verbose:
-        print(model.summary())
+        model.summary()
 
     return model
 
 
 def compile_model(model, learning_rate=0.01, decay=0.002):
     """Compile the given model using Adam optimiser."""
-    optimizer = keras.optimizers.Adam(lr=learning_rate, decay=decay)
+    optimizer = Adam(lr=learning_rate, decay=decay)
     model.compile(
         loss='categorical_crossentropy',
         optimizer=optimizer,
@@ -100,50 +100,38 @@ class LearningRateMonitor(keras.callbacks.Callback):
         learning_rate = self.model.optimizer.lr
         decay = self.model.optimizer.decay
         iterations = self.model.optimizer.iterations
-        learning_rate = learning_rate / (1 + decay * keras.backend.cast(
-            iterations, keras.backend.dtype(decay)))
-        print("Learning rate: %f." % keras.backend.eval(learning_rate))
+        iterations = keras.backend.cast(iterations, keras.backend.dtype(decay))
+        learning_rate = learning_rate / ( 1 + decay * iterations)
+        print(f"Learning rate: {learning_rate}.")
 
 
-def main():
+@click.command()
+@click.argument("model-path", type=click.Path(dir_okay=False))
+@click.option("-d", "--divisor", type=int, required=True, help="Divisor to train the model for.")
+def main(model_path, divisor):
     """Train an RNN to classify integers by their remainder.
 
-    The remainder is calculated with respect to a divisor that should be
-    supplied to the script or to the input prompt. If a compatible file called
-    checkpoint_best.hdf5 is present in the directory, it is used to initialise
-    the model weights. Otherwise, training starts from scratch.
-    The weights that yield the best performance on the validation set are
-    written to checkpoint_best.hdf5.
+    The remainder is calculated with respect to the provided divisor. The
+    provided model path is used to store the model whose performance on the
+    validation set is best. If the file already exists it is loaded and
+    training continues from the loaded weights.
     """
-    if len(sys.argv) > 1:
-        divisor = int(sys.argv[1])
-    else:
-        divisor = int(
-            input("No divisor provided."
-                  " Which divisor would you like to train for? "))
-
-    #Create and save the model
     model = create_model(divisor)
     compile_model(model, learning_rate=0.01, decay=0.002)
-    with open("model.json", "w") as json_file:
-        json_file.write(model.to_json())
 
     # Set up the checkpointing functionality
-    checkpoint_path = "checkpoint_best.hdf5"
     checkpoint = ModelCheckpoint(
-        checkpoint_path,
+        model_path,
         monitor='val_loss',
         verbose=1,
         save_best_only=True,
         mode='auto')
 
-    # If compatible checkpoint file exists use it to restart
+    # If a compatible checkpoint file was provided use it to restart
     try:
-        model.load_weights("checkpoint_best.hdf5")
+        model.load_weights(model_path)
     except (IOError, ValueError):
-        print("No compatible checkpoint file found. Training from scratch ...")
-    else:
-        print("Valid checkpoint file found. Loading weights ...")
+        print("No compatible weights provided. Training from scratch.")
 
     callbacks = [checkpoint, LearningRateMonitor()]
 

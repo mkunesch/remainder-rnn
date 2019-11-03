@@ -7,8 +7,8 @@ integers labelled by their remainder modulo a given divisor.
 import math
 import random
 
-from keras.preprocessing import sequence
 import numpy as np
+from tensorflow.keras.preprocessing import sequence
 
 
 def random_digit_array(max_length, distribute_length=False):
